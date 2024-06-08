@@ -50,7 +50,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: Text('CHARUSAT DOCS'),),
+      body: Center(child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 20.0,),
+          Text('CHARUSAT DOCS'),
+        ],
+      ),),
     );
   }
 }
