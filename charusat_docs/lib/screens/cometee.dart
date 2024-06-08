@@ -34,7 +34,7 @@ class _CometeePageState extends State<CometeePage> {
 
   late dynamic focusedMap;
   List<dynamic> focusMapList = [];
-  bool canEditDocument = true;
+  bool canEditDocument = false;
   final supabase = Supabase.instance.client;
 
   @override
