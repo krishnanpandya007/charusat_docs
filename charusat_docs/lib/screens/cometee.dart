@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:charusat_docs/screens/search.dart';
 import 'package:charusat_docs/screens/splash_screen.dart';
 import 'package:charusat_docs/screens/upload_document.dart';
 import 'package:document_file_save_plus/document_file_save_plus.dart';
@@ -148,6 +149,14 @@ class _CometeePageState extends State<CometeePage> {
             )
           : null,
       appBar: AppBar(
+        actions: [IconButton(onPressed: (){Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (ctx) => SearchDoc(
+                                              
+                                              globalMap: widget.globalMap,
+                                              contactMap: widget.contactMap,
+                                            )));}, icon: Icon(Icons.search, color: Colors.white,))],
         title: Text(
           'Charusat Docs',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
