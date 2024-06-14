@@ -27,14 +27,26 @@ class _SignUpState extends State<SignUp> {
 
       if (email.endsWith('@charusat.edu.in') || email.endsWith('@charusat.ac.in')) {
         final response = await supabase.auth.signUp(
+          data: {"name": nameController.text.trim()},
           email: email,
           password: password,
-        ).catchError((err){
+        ).then((value) {
+          print("SIGNUPERROR:");
+          print((value as AuthResponse).session);
+          print((value as AuthResponse).user);
+          print((value as AuthResponse).user?.email);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(value.toString())),
+          );
+        },).catchError((err){
+          print("SIGNUPERRORd:");
+          print(err);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: ${err}')),
           );
         });
-        if (response.user == null) {
+        if (await response.user == null) {
+
           // Handle error
           // ScaffoldMessenger.of(context).showSnackBar(
           //   SnackBar(content: Text('Error: ${response.error!.message}')),
@@ -75,12 +87,12 @@ class _SignUpState extends State<SignUp> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Image.asset(
-                      'assets/logo.jpg', // Path to your asset
+                      'assets/depstar.png', // Path to your asset
                       height: 100, // Adjust the height as needed
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Charusat Docs',
+                      'Depstar Docs',
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 20),

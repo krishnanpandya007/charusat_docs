@@ -40,12 +40,12 @@ class _SignInState extends State<SignIn> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Image.asset(
-                      'assets/logo.jpg', // Path to your asset
+                      'assets/depstar.png', // Path to your asset
                       height: 100, // Adjust the height as needed
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Welcome To Charusat Docs',
+                      'Welcome To Depstar docs',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,

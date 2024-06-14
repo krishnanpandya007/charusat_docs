@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:charusat_docs/screens/cometee.dart';
+import 'package:charusat_docs/screens/signin.dart';
+import 'package:charusat_docs/supabase.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -22,7 +27,19 @@ class _SplashScreenState extends State<SplashScreen> {
     // load data
     loadData() async {
 
+
+
       final supabase = Supabase.instance.client;
+      
+      await Timer(Duration(seconds: 2), (){});
+
+      if(supabase.auth.currentSession == null || StorageService.getUserSession == null) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: ((context) => SignIn())));  
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(supabase.auth.currentUser?.email ?? 'Sign in please')),
+          );
+
       final committeeInfo = await supabase.from("Committee").select().order('id', ascending: true);
       final contactInfo = await supabase.from("Contact").select().order('id', ascending: true);
 
@@ -40,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
       }
 
-      Navigator.of(context).push(MaterialPageRoute(builder: ((context) => CometeePage(navigationStack: [], globalMap: globalMap, contactMap: contactMap,))));  
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: ((context) => CometeePage(navigationStack: [], globalMap: globalMap, contactMap: contactMap,))));  
 
     }
     loadData();
@@ -55,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen> {
         children: [
           CircularProgressIndicator(),
           SizedBox(height: 20.0,),
-          Text('CHARUSAT DOCS'),
+          Text('DEPSTAR DOCS'),
         ],
       ),),
     );

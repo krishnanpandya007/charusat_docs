@@ -30,30 +30,32 @@ class _SearchDocState extends State<SearchDoc> {
         backgroundColor: Colors.blue[500],
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            TextField(
-              onChanged: _onQueryChange,
-              onSubmitted: _onQueryChange,
-              controller: _searchDocNameController,
-              // readOnly: true,
-              decoration: InputDecoration(
-                labelText: 'Document name',
-                border: OutlineInputBorder(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            children: [
+              TextField(
+                onChanged: _onQueryChange,
+                onSubmitted: _onQueryChange,
+                controller: _searchDocNameController,
+                // readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Document name',
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            SizedBox(height: 25.0,),
-            Container(width:double.infinity, color: Colors.blue,child: Center(child: Text("RESULTS", style: TextStyle(color: Colors.white),)),),
-            SizedBox(height: 15.0,),
-            _searchResults.isEmpty ? Center(child: Text("Oops, Nothing to show...", style: TextStyle(color: Colors.grey),),) :  Expanded(
-              child: Column(
-                children: _searchResults.map((elem) => _resultEntry(elem["name"], elem["path"])).toList()
-
-              ),
-            )
-          ],
+              SizedBox(height: 25.0,),
+              Container(width:double.infinity, color: Colors.blue,child: Center(child: Text("RESULTS", style: TextStyle(color: Colors.white),)),),
+              SizedBox(height: 15.0,),
+              _searchResults.isEmpty ? Center(child: Text("Oops, Nothing to show...", style: TextStyle(color: Colors.grey),),) :  Expanded(
+                child: Column(
+                  children: _searchResults.map((elem) => _resultEntry(elem["name"], elem["path"])).toList()
+        
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

@@ -158,7 +158,7 @@ class _CometeePageState extends State<CometeePage> {
                                               contactMap: widget.contactMap,
                                             )));}, icon: Icon(Icons.search, color: Colors.white,))],
         title: Text(
-          'Charusat Docs',
+          'Depstar Docs',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: Colors.blue[500],

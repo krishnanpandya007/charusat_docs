@@ -1,6 +1,7 @@
 import 'package:charusat_docs/routes_name.dart';
 import 'package:charusat_docs/screens/cometee.dart';
 import 'package:charusat_docs/screens/signin.dart';
+import 'package:charusat_docs/screens/signup.dart';
 import 'package:charusat_docs/screens/splash_screen.dart';
 import 'package:charusat_docs/screens/upload_document.dart';
 import 'package:charusat_docs/supabase.dart';
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: SplashScreen(),  
+      home: SignUp(),  
     );
   }
 }
