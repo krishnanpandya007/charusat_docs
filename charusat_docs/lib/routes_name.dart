@@ -1,6 +1,7 @@
 import 'package:charusat_docs/done.dart';
 import 'package:charusat_docs/screens/signin.dart';
 import 'package:charusat_docs/screens/signup.dart';
+import 'package:charusat_docs/screens/splash_screen.dart';
 import 'package:charusat_docs/screens/verify.dart';
 import 'package:get/get.dart';
 
@@ -9,6 +10,7 @@ class RoutesName {
   static const String signup = "/signup";
   static const String done = "/done";
   static const String verify = "/verify";
+  static const String splash = "/splash";
 }
 
 class Pages {
@@ -28,6 +30,10 @@ class Pages {
     GetPage(
       name: RoutesName.verify,
       page: () => const EmailVerification(),
+    ),
+    GetPage(
+      name: RoutesName.splash,
+      page: () => const SplashScreen(),
     ),
   ];
 }

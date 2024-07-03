@@ -36,7 +36,12 @@ class _SignUpState extends State<SignUp> {
           print((value as AuthResponse).user);
           print((value as AuthResponse).user?.email);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(value.toString())),
+            SnackBar(content: Text('Sign-up successful! Please verify your email.')),
+          );
+          Navigator.pushAndRemoveUntil<void>(
+            context,
+            MaterialPageRoute<void>(builder: (BuildContext context) => EmailVerification()),
+            ModalRoute.withName('/'),
           );
         },).catchError((err){
           print("SIGNUPERRORd:");
@@ -45,23 +50,23 @@ class _SignUpState extends State<SignUp> {
             SnackBar(content: Text('Error: ${err}')),
           );
         });
-        if (await response.user == null) {
+        // if (await response.user == null) {
 
-          // Handle error
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(content: Text('Error: ${response.error!.message}')),
-          // );
-        } else {
-          // Handle successful sign-up
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Sign-up successful! Please verify your email.')),
-          );
-          Navigator.pushAndRemoveUntil<void>(
-            context,
-            MaterialPageRoute<void>(builder: (BuildContext context) => EmailVerification()),
-            ModalRoute.withName('/'),
-          );
-        }
+        //   // Handle error
+        //   // ScaffoldMessenger.of(context).showSnackBar(
+        //   //   SnackBar(content: Text('Error: ${response.error!.message}')),
+        //   // );
+        // } else {
+        //   // Handle successful sign-up
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     SnackBar(content: Text('Sign-up successful! Please verify your email.')),
+        //   );
+        //   Navigator.pushAndRemoveUntil<void>(
+        //     context,
+        //     MaterialPageRoute<void>(builder: (BuildContext context) => EmailVerification()),
+        //     ModalRoute.withName('/'),
+        //   );
+        // }
       } else {
         // Show error if email is not from organization
         ScaffoldMessenger.of(context).showSnackBar(

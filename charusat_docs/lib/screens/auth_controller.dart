@@ -13,10 +13,10 @@ class AuthController extends GetxController {
   void login(String email, String password) async {
     signinloading.value = true;
     final response = await authApi.login_method(email, password);
-    if (response.isBlank == null) {
+    if (response.user == null) {
       Get.snackbar("Success", "Logged in successfully");
     } else {
-      Get.snackbar("Error", "Something went wrong");
+      // Get.snackbar("Error", "Something went wrong");
     }
     signinloading.value = false;
   }
@@ -25,7 +25,7 @@ class AuthController extends GetxController {
     signuploading.value = true;
     final response = await authApi.signup_method(email, password);
     signuploading.value = false;
-    if (response.isBlank == null) {
+    if (response.user == null) {
       Get.snackbar(
           "Success", "Signed up successfully. Please verify your email.");
       Get.toNamed(RoutesName.verify);

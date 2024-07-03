@@ -1,5 +1,6 @@
 import 'package:charusat_docs/screens/auth_controller.dart';
 import 'package:charusat_docs/routes_name.dart';
+import 'package:charusat_docs/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,12 +18,49 @@ class _SignInState extends State<SignIn> {
   final TextEditingController emailcontroller = TextEditingController(text: "");
   final TextEditingController passwordcontroller =
       TextEditingController(text: "");
-
+  bool loading = false;
   final AuthController authController = Get.put(
     AuthController(
       authApi: AuthApi(supabaseClient: Supabase.instance.client),
     ),
   );
+
+  void handleSignin(String email, String password) async {
+    setState(() {
+      loading = true;
+    });
+    try{
+
+        final response = await Supabase.instance.client.auth.signInWithPassword(email: email, password: password);
+
+        if(response.user == null){
+          Get.snackbar("Error", "2 Invalid credentials");
+        } else {
+          //       ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text("welcome, ${response.user?.email}")),
+          // );
+          // // Get.snackbar("Error", "3 Invalid credentials");
+          // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: ((context) => SplashScreen())));  
+
+
+
+
+        }
+        authController.login(email, password);
+
+    }catch (e){
+          Get.snackbar("Error", "Invalid credentials");
+
+    }
+     finally  {
+      
+    setState(() {
+      loading = false;
+    });
+    }
+
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,12 +151,12 @@ class _SignInState extends State<SignIn> {
                         onPressed: () {
                           if (_form.currentState!.validate() &&
                               authController.signinloading.value == false) {
-                            authController.login(
+                            handleSignin(
                                 emailcontroller.text, passwordcontroller.text);
                           }
                         },
                         child: Text(
-                          authController.signinloading.value
+                          (authController.signinloading.value || true) && loading
                               ? "Loading........"
                               : 'Sign In',
                         ),

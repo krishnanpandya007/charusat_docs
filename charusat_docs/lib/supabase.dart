@@ -36,7 +36,7 @@ class SupabaseService extends GetxService {
       } else if (event == AuthChangeEvent.signedIn) {
         if (session != null) {
           StorageService.saveUserSession(session);
-          Get.offNamed(RoutesName.done);
+          Get.offNamed(RoutesName.splash);
         }
       } else if (event == AuthChangeEvent.tokenRefreshed) {
         StorageService.clearUserSession();

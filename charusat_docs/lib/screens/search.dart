@@ -30,32 +30,31 @@ class _SearchDocState extends State<SearchDoc> {
         backgroundColor: Colors.blue[500],
       ),
 
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              TextField(
-                onChanged: _onQueryChange,
-                onSubmitted: _onQueryChange,
-                controller: _searchDocNameController,
-                // readOnly: true,
-                decoration: InputDecoration(
-                  labelText: 'Document name',
-                  border: OutlineInputBorder(),
-                ),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          
+          children: [
+            TextField(
+              onChanged: _onQueryChange,
+              onSubmitted: _onQueryChange,
+              controller: _searchDocNameController,
+              // readOnly: true,
+              decoration: InputDecoration(
+                labelText: 'Document name',
+                border: OutlineInputBorder(),
               ),
-              SizedBox(height: 25.0,),
-              Container(width:double.infinity, color: Colors.blue,child: Center(child: Text("RESULTS", style: TextStyle(color: Colors.white),)),),
-              SizedBox(height: 15.0,),
-              _searchResults.isEmpty ? Center(child: Text("Oops, Nothing to show...", style: TextStyle(color: Colors.grey),),) :  Expanded(
-                child: Column(
-                  children: _searchResults.map((elem) => _resultEntry(elem["name"], elem["path"])).toList()
-        
-                ),
-              )
-            ],
-          ),
+            ),
+            SizedBox(height: 25.0,),
+            Container(width:double.infinity, color: Colors.blue,child: Center(child: Text("RESULTS", style: TextStyle(color: Colors.white),)),),
+            SizedBox(height: 15.0,),
+            Expanded(child:_searchResults.isEmpty ? Center(child: Text("Oops, Nothing to show...", style: TextStyle(color: Colors.grey),),) :  Column(
+              children: _searchResults.map((elem) => _resultEntry(elem["name"], elem["url"])).toList()
+                    
+            ) 
+            )
+            
+          ],
         ),
       ),
     );
@@ -98,20 +97,27 @@ class _SearchDocState extends State<SearchDoc> {
 
   List<Map<String, dynamic>> searchInDataStructure(
     Map<String, dynamic> data, String query, List<String> currentPath) {
+      print("DEBUG::");
+      print(data);
   List<Map<String, dynamic>> results = [];
 
   data.forEach((key, value) {
     if (value is List) {
       for (var item in value) {
         if (item['name'].toLowerCase().contains(query.toLowerCase())) {
-          results.add({'name': item['name'], 'path': [...currentPath, key]});
+          print("adding");
+          results.add({'name': item['name'], 'url': [...currentPath, key]});
         }
       }
     } else if (value is Map) {
+          print("recursing");
+
       results.addAll(searchInDataStructure(
           value as Map<String,dynamic>, query, [...currentPath, key.toString()]));
     }
   });
+  print("Done");
+  print(results);
 
   return results;
 }

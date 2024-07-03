@@ -4,13 +4,17 @@ import 'dart:typed_data';
 import 'package:charusat_docs/screens/search.dart';
 import 'package:charusat_docs/screens/splash_screen.dart';
 import 'package:charusat_docs/screens/upload_document.dart';
+import 'package:charusat_docs/supabase.dart';
 import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class CometeePage extends StatefulWidget {
   List<String> navigationStack = [];
@@ -58,9 +62,13 @@ class _CometeePageState extends State<CometeePage> {
       List<String> adminEmails = [];
       (widget.contactMap?[widget.navigationStack[0]] as Map)
           .forEach((key, personList) {
-        for (final person in personList) {
-          adminEmails.add(person['email']);
-        }
+            if(key == "Process Owner" || key == "Co-ordinator"){
+              for (final person in personList) {
+                print("Hid");
+                print(personList);
+                adminEmails.add(person['email']);
+              }
+            }
       });
       print(adminEmails);
       if (supabase.auth.currentUser != null) {
@@ -131,8 +139,8 @@ class _CometeePageState extends State<CometeePage> {
                                   SizedBox(
                                     height: 20.0,
                                   ),
-                                  ...getContactPersonsOfType('Process Owners'),
-                                  ...getContactPersonsOfType('Co-ordinators'),
+                                  ...getContactPersonsOfType('Process Owner'),
+                                  ...getContactPersonsOfType('Co-ordinator'),
                                   ...getContactPersonsOfType('DCE'),
                                   ...getContactPersonsOfType('DIT'),
                                   ...getContactPersonsOfType('DCSE'),
@@ -156,7 +164,40 @@ class _CometeePageState extends State<CometeePage> {
                                               
                                               globalMap: widget.globalMap,
                                               contactMap: widget.contactMap,
-                                            )));}, icon: Icon(Icons.search, color: Colors.white,))],
+                                            )));}, icon: Icon(Icons.search, color: Colors.white,)),IconButton(onPressed: (){
+                                              showModalBottomSheet<void>(
+                                                // context and builder are
+                                                // required properties in this widget
+                                                context: context,
+                                                // isScrollControlled: true,
+                                                isDismissible: true,
+
+                                                builder: (BuildContext context) {
+                                                  // we set up a container inside which
+                                                  // we create center column and display text
+
+                                                  // Returning SizedBox instead of a Container
+                                                  return SizedBox(
+                                                    height: 150,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.symmetric(vertical: 25.0, horizontal: 15),
+                                                      child: Column(children: [
+                                                        Row(children: [Icon(Icons.person), SizedBox(width: 10,), Text(supabase.auth.currentUser?.email ?? ' User 12423')],),
+                                                        SizedBox(height: 15,),
+                                                        SizedBox(width: double.infinity,child: FilledButton(onPressed: ()async{
+                                                          await supabase.auth.signOut();
+                                                          Get.delete(force: true);
+                                                          StorageService.clearUserSession();
+                                                          Navigator.pushReplacement(context, MaterialPageRoute(
+                                                            builder: (ctx) => SplashScreen()));
+                                                      
+                                                        }, child: Text('Sign Out')))
+                                                      ],),
+                                                    ),
+                                                  );
+                                                }
+                                              );
+                                            }, icon: Icon(Icons.person, color: Colors.white,))],
         title: Text(
           'Depstar Docs',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
@@ -188,19 +229,19 @@ class _CometeePageState extends State<CometeePage> {
                         title: Text((focusMapList)[index]),
                         onTap: mapType == 'docs'
                             ? () async {
-                                final Uint8List file = await supabase.storage
+                                final String fileUrl = await supabase.storage
                                     .from("Documents")
-                                    .download(widget.navigationStack.join('/') +
+                                    .getPublicUrl(widget.navigationStack.join('/') +
                                         '/' +
-                                        (focusMapList)[index])
-                                    .catchError((e) {
-                                });
-                                DocumentFileSavePlus().saveFile(file, widget.navigationStack.join('_') + '_' + (focusMapList)[index], 'application/pdf');
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Done! check your downloads folder...'),
-                                  ),
-                                );
+                                        (focusMapList)[index]);
+                                await launchUrl(Uri.parse(fileUrl), mode: LaunchMode.externalNonBrowserApplication);
+
+                                // DocumentFileSavePlus().saveFile(file, widget.navigationStack.join('_') + '_' + (focusMapList)[index], 'application/pdf');
+                                // ScaffoldMessenger.of(context).showSnackBar(
+                                //   SnackBar(
+                                //     content: Text('Done! check your downloads folder...'),
+                                //   ),
+                                // );
                                 // Directory? d = await getDownloadsDirectory();
                                 // OpenFile.open("${d?.path}/${(focusMapList)[index]}");
                                 // File a = File(widget.navigationStack.join('_') + '_' + (focusMapList)[index]);
@@ -362,7 +403,9 @@ class _CometeePageState extends State<CometeePage> {
               title: Text(val['email']),
               leading: Icon(Icons.email_outlined),
               contentPadding: EdgeInsets.zero,
-              onTap: () {},
+              onTap: () {
+                launchUrlString("mailto:${val['email']}");
+              },
             ),
           ],
         );

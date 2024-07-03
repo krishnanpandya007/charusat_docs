@@ -35,10 +35,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if(supabase.auth.currentSession == null || StorageService.getUserSession == null) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: ((context) => SignIn())));  
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //       SnackBar(content: Text(supabase.auth.currentUser?.email ?? 'Sign in please')),
+        //     );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(supabase.auth.currentUser?.email ?? 'welcome')),
+            );
+
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(supabase.auth.currentUser?.email ?? 'Sign in please')),
-          );
 
       final committeeInfo = await supabase.from("Committee").select().order('id', ascending: true);
       final contactInfo = await supabase.from("Contact").select().order('id', ascending: true);
