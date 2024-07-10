@@ -22,9 +22,12 @@
 //   }
 // }
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:charusat_docs/screens/splash_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_file/open_file.dart';
@@ -47,6 +50,8 @@ class _UploadDocumentState extends State<UploadDocumentScreen> {
   String? _filePath;
   bool uploading = false;
   final supabase = Supabase.instance.client;
+  final storage = FirebaseStorage.instance;
+  FirebaseFirestore db = FirebaseFirestore.instance;
 
 
   @override
@@ -142,11 +147,18 @@ class _UploadDocumentState extends State<UploadDocumentScreen> {
       uploading = true;
     });
 
-    final String fullPath = await supabase.storage.from('Documents').upload(
-      widget.navigationStack.join('/') + '/' + (_fileName?? 'Document.pdf'),
-      File(_filePath!),
-      fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
-    ).catchError((err) {
+    final storageRef = FirebaseStorage.instance.ref();
+
+    final destRef = storageRef.child(widget.navigationStack.join('/') + '/' + (_fileName?? 'Document.pdf'));
+
+    // final String fullPath = await supabase.storage.from('Documents').upload(
+    //   widget.navigationStack.join('/') + '/' + (_fileName?? 'Document.pdf'),
+    //   File(_filePath!),
+    //   fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+    // )
+    destRef.putFile(File(_filePath!))
+
+    .catchError((err) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error while uploading, try again later!!')),
       );
@@ -159,8 +171,20 @@ class _UploadDocumentState extends State<UploadDocumentScreen> {
     // Upadte the entry
 
     dynamic data = await supabase.from('Committee').select('child').eq('name', widget.navigationStack[0]);
-    data = data[0];
-    data = data['child'];
+    await db.collection("Comeetee").doc(widget.navigationStack[0]).get().then((event) {
+        // event.printError();
+        // print(event.);
+        data = event.data()?["child"];
+        data = jsonDecode(data);
+        // print("AYYY");
+        // print(data);
+        // for (var doc in event.docs) {
+        //   print("${doc.id} => ${doc.data()}");
+        //   globalMap[doc.id] = jsonDecode(doc.data()["child"]);
+        // }
+      });
+    // data = data[0];
+    // data = data['child'];
     if(data is List){
       data.add({"name": _fileName, "url": widget.navigationStack.join('/') + '/' + (_fileName?? 'Document.pdf')});
     } else {
@@ -184,8 +208,7 @@ class _UploadDocumentState extends State<UploadDocumentScreen> {
         throw Exception("Target is not a list: ${tmpNavStk.join(' -> ')}");
       }
     }
-
-    await supabase.from("Committee").update({'child': data}).eq('name', widget.navigationStack[0]).then((value) {
+    await db.collection("Comeetee").doc(widget.navigationStack[0]).update({"child": jsonEncode(data)}).then((value) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Document uploaded!!')),
         );
@@ -194,7 +217,17 @@ class _UploadDocumentState extends State<UploadDocumentScreen> {
       });
 
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (ct) => SplashScreen()));
-    });  
+    });
+    // await supabase.from("Committee").update({'child': data}).eq('name', widget.navigationStack[0]).then((value) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(content: Text('Document uploaded!!')),
+    //     );
+    //   setState(() {
+    //     uploading = false;
+    //   });
+
+    //   Navigator.pushReplacement(context, MaterialPageRoute(builder: (ct) => SplashScreen()));
+    // });  
 
 
 
@@ -219,5 +252,6 @@ class _UploadDocumentState extends State<UploadDocumentScreen> {
       throw Exception("Target is not a list: ${keys.join(' -> ')}");
     }
   }
+  
 
 }

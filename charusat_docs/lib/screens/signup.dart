@@ -3,6 +3,7 @@ import 'package:charusat_docs/screens/verify.dart';
 // import 'package:docs/signin.dart';
 // import 'package:docs/verify.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUp extends StatefulWidget {
@@ -27,7 +28,7 @@ class _SignUpState extends State<SignUp> {
 
       if (email.endsWith('@charusat.edu.in') || email.endsWith('@charusat.ac.in')) {
         final response = await supabase.auth.signUp(
-          data: {"name": nameController.text.trim()},
+          // data: {"name": nameController.text.trim()},
           email: email,
           password: password,
         ).then((value) {
@@ -45,7 +46,7 @@ class _SignUpState extends State<SignUp> {
           );
         },).catchError((err){
           print("SIGNUPERRORd:");
-          print(err);
+          print(err.toString());
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: ${err}')),
           );

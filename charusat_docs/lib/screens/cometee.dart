@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -5,7 +6,9 @@ import 'package:charusat_docs/screens/search.dart';
 import 'package:charusat_docs/screens/splash_screen.dart';
 import 'package:charusat_docs/screens/upload_document.dart';
 import 'package:charusat_docs/supabase.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:document_file_save_plus/document_file_save_plus.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -39,7 +42,7 @@ class _CometeePageState extends State<CometeePage> {
 
   late dynamic focusedMap;
   List<dynamic> focusMapList = [];
-  bool canEditDocument = false;
+  bool canEditDocument = true;
   final supabase = Supabase.instance.client;
 
   @override
@@ -234,7 +237,21 @@ class _CometeePageState extends State<CometeePage> {
                                     .getPublicUrl(widget.navigationStack.join('/') +
                                         '/' +
                                         (focusMapList)[index]);
-                                await launchUrl(Uri.parse(fileUrl), mode: LaunchMode.externalNonBrowserApplication);
+                                final storageRef = FirebaseStorage.instance.ref();
+                                final gsReference = FirebaseStorage.instance.refFromURL("gs://depstar-docs.appspot.com/" + widget.navigationStack.join('/') +
+                                        '/' +
+                                        (focusMapList)[index]);
+                                        print("Download URL");
+                                        print(widget.navigationStack.join('/') +
+                                        '/' +
+                                        (focusMapList)[index]);
+                                        print(await storageRef.child(widget.navigationStack.join('/') +
+                                        '/' +
+                                        (focusMapList)[index]).getDownloadURL());
+
+                                await launchUrl(Uri.parse(await storageRef.child(widget.navigationStack.join('/') +
+                                        '/' +
+                                        (focusMapList)[index]).getDownloadURL()), mode: LaunchMode.externalNonBrowserApplication);
 
                                 // DocumentFileSavePlus().saveFile(file, widget.navigationStack.join('_') + '_' + (focusMapList)[index], 'application/pdf');
                                 // ScaffoldMessenger.of(context).showSnackBar(
@@ -271,24 +288,17 @@ class _CometeePageState extends State<CometeePage> {
                                     onPressed: () async {
                                       //delete document from bucket and from database entry in Committee
                                       // delete a file, delete an entry
-                                      final List<FileObject> objects =
-                                          await supabase.storage
-                                              .from("Documents")
-                                              .remove([
+                                      // final List<FileObject> objects =
+                                          await FirebaseStorage.instance.ref().child(
                                         widget.navigationStack.join('/') +
                                             '/' +
                                             (focusMapList)[index]
-                                      ]).catchError((err) {
-                                        print("Unable To Delete file");
-                                        print(err);
-                                      });
-                                      dynamic data = await supabase
-                                          .from('Committee')
-                                          .select('child')
-                                          .eq('name',
-                                              widget.navigationStack[0]);
-                                      data = data[0];
-                                      data = data['child'];
+                                      ).delete();
+                                      dynamic data = await FirebaseFirestore.instance.collection("Comeetee").doc(widget.navigationStack[0]).get();
+                                      // data = data[0];
+                                      // data = data['child'];
+                                      // data = event.data()?["child"];
+                                      data = jsonDecode(data.data()["child"]);
                                       if(data is List){
                                         for (var i = 0;
                                               i < data.length;
@@ -335,11 +345,7 @@ class _CometeePageState extends State<CometeePage> {
                                               "Target is not a list: ${tmpNavStk.join(' -> ')}");
                                         }
                                       }
-                                      await supabase
-                                          .from("Committee")
-                                          .update({'child': data})
-                                          .eq('name', widget.navigationStack[0])
-                                          .then((value) {
+                                      await FirebaseFirestore.instance.collection("Comeetee").doc(widget.navigationStack[0]).update({"child": jsonEncode(data)}).then((value) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(

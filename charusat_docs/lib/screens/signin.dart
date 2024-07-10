@@ -49,6 +49,8 @@ class _SignInState extends State<SignIn> {
         authController.login(email, password);
 
     }catch (e){
+      print("GOTCHA");
+      print(e);
           Get.snackbar("Error", "Invalid credentials");
 
     }
